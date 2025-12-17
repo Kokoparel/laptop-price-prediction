@@ -7,7 +7,7 @@ import seaborn as sns
 
 # Page config
 st.set_page_config(
-    page_title="Prediksi Harga Laptop v2.0",
+    page_title="Prediksi Harga Laptop",
     page_icon="💻",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -28,6 +28,27 @@ st.markdown("""
         padding: 1rem;
         border-radius: 10px;
         color: white;
+    }
+    .team-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1.5rem;
+        border-radius: 10px;
+        color: white;
+        margin-bottom: 1rem;
+    }
+    .team-name {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .team-role {
+        font-size: 1rem;
+        color: #ffd700;
+        margin-bottom: 0.5rem;
+    }
+    .team-work {
+        font-size: 0.9rem;
+        line-height: 1.6;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -53,7 +74,7 @@ best_model_name = model_data['best_model_name']
 all_results = model_data['all_results']
 
 # Title
-st.markdown('<p class="main-header">💻 Prediksi Harga Laptop v2.0</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-header">💻 Prediksi Harga Laptop </p>', unsafe_allow_html=True)
 st.markdown(f"<p style='text-align: center; color: #666;'>Powered by <b>{best_model_name}</b> | "
             f"Akurasi: <b>{all_results[best_model_name]['test_r2']*100:.1f}%</b></p>", 
             unsafe_allow_html=True)
@@ -62,7 +83,7 @@ st.markdown(f"<p style='text-align: center; color: #666;'>Powered by <b>{best_mo
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/979/979585.png", width=100)
     st.title("Navigation")
-    page = st.radio("Pilih Halaman:", ["🔮 Prediksi", "📊 Perbandingan Model", "ℹ️ Info Model"])
+    page = st.radio("Pilih Halaman:", ["🔮 Prediksi", "📊 Perbandingan Model", "ℹ️ Info Model", "👥 Tim Pengembang"])
     
     st.markdown("---")
     st.markdown("### 🎯 Quick Stats")
@@ -129,54 +150,82 @@ if page == "🔮 Prediksi":
     
     with col1:
         st.subheader("💾 Hardware Utama")
-        ram = st.slider("RAM (GB)", 
-                       min_value=int(feature_ranges['ram_min']),
-                       max_value=int(feature_ranges['ram_max']),
-                       value=8, step=2)
         
-        storage = st.slider("Storage (GB)", 
-                           min_value=int(feature_ranges['storage_min']),
-                           max_value=int(feature_ranges['storage_max']),
-                           value=256, step=128)
+        # ✅ RAM dropdown - opsi realistis
+        ram = st.selectbox("RAM (GB)", 
+                          options=[4, 8, 16, 32, 64],
+                          index=1,  # Default: 8GB
+                          help="Pilih kapasitas RAM laptop")
         
-        is_ssd = st.selectbox("Tipe Storage", ["SSD", "HDD"])
+        # ✅ Storage dropdown - opsi realistis
+        storage = st.selectbox("Storage (GB)", 
+                              options=[128, 256, 512, 1024, 2048],
+                              index=1,  # Default: 256GB
+                              help="Pilih kapasitas penyimpanan")
+        
+        # ✅ Storage type
+        is_ssd = st.selectbox("Tipe Storage", 
+                             options=["SSD", "HDD"],
+                             index=0,  # Default: SSD
+                             help="SSD lebih cepat dari HDD")
         is_ssd_val = 1 if is_ssd == "SSD" else 0
     
     with col2:
         st.subheader("🖥️ Display & Desain")
-        screen_size = st.slider("Ukuran Layar (inches)", 
-                               min_value=float(feature_ranges['screen_min']),
-                               max_value=float(feature_ranges['screen_max']),
-                               value=15.6, step=0.1)
         
+        # ✅ Screen size dropdown - ukuran standar
+        screen_size = st.selectbox("Ukuran Layar (inches)", 
+                                  options=[11.6, 13.3, 14.0, 15.6, 17.3],
+                                  index=3,  # Default: 15.6"
+                                  help="Ukuran diagonal layar laptop")
+        
+        # ✅ Screen resolution
         screen_res = st.selectbox("Resolusi Layar", 
-                                 ["HD (1366x768)", "Full HD (1920x1080)", 
-                                  "QHD/Retina (2560x1600)", "4K (3840x2160)"])
-        screen_res_map = {"HD (1366x768)": 1, "Full HD (1920x1080)": 2, 
-                         "QHD/Retina (2560x1600)": 3, "4K (3840x2160)": 4}
+                                 options=["HD (1366x768)", 
+                                         "Full HD (1920x1080)", 
+                                         "QHD/Retina (2560x1600)", 
+                                         "4K (3840x2160)"],
+                                 index=1,  # Default: Full HD
+                                 help="Resolusi layar laptop")
+        screen_res_map = {"HD (1366x768)": 1, 
+                         "Full HD (1920x1080)": 2, 
+                         "QHD/Retina (2560x1600)": 3, 
+                         "4K (3840x2160)": 4}
         screen_res_val = screen_res_map[screen_res]
         
-        weight = st.slider("Berat (kg)", 
-                          min_value=float(feature_ranges['weight_min']),
-                          max_value=float(feature_ranges['weight_max']),
-                          value=2.0, step=0.1)
+        # ✅ Weight dropdown - berat realistis
+        weight = st.selectbox("Berat (kg)", 
+                             options=[1.0, 1.2, 1.5, 1.8, 2.0, 2.3, 2.5, 3.0],
+                             index=4,  # Default: 2.0kg
+                             help="Berat laptop dalam kilogram")
     
     with col3:
         st.subheader("⚙️ Spesifikasi Lainnya")
+        
         companies = sorted(encoders['company'].classes_.tolist())
-        company = st.selectbox("Merek", companies)
+        company = st.selectbox("Merek", 
+                              options=companies,
+                              help="Pilih merek laptop")
         
         types = sorted(encoders['typename'].classes_.tolist())
-        typename = st.selectbox("Tipe Laptop", types)
+        typename = st.selectbox("Tipe Laptop", 
+                               options=types,
+                               help="Kategori laptop (Gaming, Ultrabook, dll)")
         
         cpus = sorted(encoders['cpu'].classes_.tolist())
-        cpu = st.selectbox("Processor", cpus)
+        cpu = st.selectbox("Processor", 
+                          options=cpus,
+                          help="Pilih processor laptop")
         
         gpus = sorted(encoders['gpu'].classes_.tolist())
-        gpu = st.selectbox("Graphics Card", gpus)
+        gpu = st.selectbox("Graphics Card", 
+                          options=gpus,
+                          help="Pilih kartu grafis")
         
         oss = sorted(encoders['os'].classes_.tolist())
-        os_sys = st.selectbox("Sistem Operasi", oss)
+        os_sys = st.selectbox("Sistem Operasi", 
+                             options=oss,
+                             help="Pilih sistem operasi")
     
     # Prediction button
     if st.button("🎯 PREDIKSI HARGA", type="primary", use_container_width=True):
@@ -351,7 +400,7 @@ elif page == "📊 Perbandingan Model":
     st.info(f"🏆 **Model Terbaik:** {best_model_name} dengan Test R² = {all_results[best_model_name]['test_r2']:.4f}")
 
 # PAGE 3: MODEL INFO
-else:
+elif page == "ℹ️ Info Model":
     st.header("ℹ️ Informasi Model")
     
     tab1, tab2, tab3 = st.tabs(["📖 Tentang Model", "🔧 Feature Engineering", "📚 Metodologi"])
@@ -444,11 +493,111 @@ else:
         - Price range: €174.99 - €6,099.00
         """)
 
+# PAGE 4: TIM PENGEMBANG
+else:
+    st.header("👥 Tim Pengembang")
+    st.markdown("### Project: Prediksi Harga Laptop Menggunakan Machine Learning")
+    
+    st.markdown("---")
+    
+    # Team Member 1
+    st.markdown("""
+    <div class="team-card">
+        <div class="team-name">1. Farrel Athaillah Wijaya</div>
+        <div class="team-role">📊 Data Preprocessing & Feature Extraction</div>
+        <div class="team-work">
+        <b>Kontribusi:</b><br>
+        • Cleaning data (hapus duplikat & missing values)<br>
+        • Ekstrak RAM dari "8GB" → angka 8<br>
+        • Ekstrak Storage dari "256GB SSD" → 256 + deteksi SSD/HDD<br>
+        • Ekstrak Weight dari "2.1kg" → angka 2.1<br>
+        • Ekstrak Screen Size<br>
+        <br>
+        <b>File:</b> train_model_v2.py (baris 20-60)
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Team Member 2
+    st.markdown("""
+    <div class="team-card">
+        <div class="team-name">2. Surya Andika Tandranparang</div>
+        <div class="team-role">🔧 Feature Engineering (Kategorisasi)</div>
+        <div class="team-work">
+        <b>Kontribusi:</b><br>
+        • Fungsi kategorisasi CPU (Intel i7 = tier 4, i5 = tier 3, dst)<br>
+        • Fungsi kategorisasi GPU (NVIDIA GTX = 3, NVIDIA = 2, Intel = 1)<br>
+        • Fungsi kategorisasi Brand (Apple/MSI = premium, Dell/HP = mid)<br>
+        • Fungsi kategorisasi OS (macOS = 3, Windows 10 = 2, dst)<br>
+        • Fungsi kategorisasi Screen Resolution (4K = 4, Full HD = 2, HD = 1)<br>
+        <br>
+        <b>File:</b> train_model_v2.py (baris 61-130)
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Team Member 3
+    st.markdown("""
+    <div class="team-card">
+        <div class="team-name">3. Thalia Dyah Zaneta</div>
+        <div class="team-role">🤖 Model Training & Evaluation</div>
+        <div class="team-work">
+        <b>Kontribusi:</b><br>
+        • Split data: training (80%) dan testing (20%)<br>
+        • Training 3 model: Linear Regression, Random Forest, Gradient Boosting<br>
+        • Hitung metrik: R² Score, RMSE, MAE<br>
+        • Cross-validation 5-fold<br>
+        • Pilih model terbaik & save ke file .pkl<br>
+        <br>
+        <b>File:</b> train_model_v2.py (baris 150-250)
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Team Member 4
+    st.markdown("""
+    <div class="team-card">
+        <div class="team-name">4. Putri Alisyah Zafira</div>
+        <div class="team-role">🎨 Streamlit UI (Input & Prediksi)</div>
+        <div class="team-work">
+        <b>Kontribusi:</b><br>
+        • Page config & custom CSS styling<br>
+        • Sidebar dengan navigation<br>
+        • Halaman "Prediksi" dengan input form (dropdown RAM, Storage, Screen, Weight)<br>
+        • Tombol "PREDIKSI HARGA" & logic prediksi<br>
+        • Tampilkan hasil (Euro, USD, IDR) & tabel spesifikasi<br>
+        <br>
+        <b>File:</b> app_v2.py (baris 1-290)
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Team Member 5
+    st.markdown("""
+    <div class="team-card">
+        <div class="team-name">5. Hakan Ilyasa</div>
+        <div class="team-role">📈 Streamlit UI (Visualisasi & Info)</div>
+        <div class="team-work">
+        <b>Kontribusi:</b><br>
+        • Halaman "Perbandingan Model" dengan bar chart (R² Score & RMSE)<br>
+        • Tabel perbandingan metrik dengan highlight<br>
+        • Halaman "Info Model" dengan 3 tabs (Tentang, Feature Engineering, Metodologi)<br>
+        • Visualisasi Feature Importance (bar chart)<br>
+        • Footer aplikasi<br>
+        <br>
+        <b>File:</b> app_v2.py (baris 291-500)
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.success("✅ **Total:** 5 Anggota Tim | **Tech Stack:** Python, Streamlit, Scikit-learn, Pandas")
+
 # Footer
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
-    <p>💻 Aplikasi Prediksi Harga Laptop v2.0 | Advanced ML Model</p>
+    <p>💻 Aplikasi Prediksi Harga Laptop | Advanced ML Model</p>
     <p>Powered by {model} • Built with Streamlit</p>
 </div>
 """.format(model=best_model_name), unsafe_allow_html=True)
